@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.database.sqlite.SQLiteConstraintException;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -22,23 +23,30 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class MainViewModel extends AndroidViewModel {
+public class ArticlesViewModel extends AndroidViewModel {
 
     private DataRepository dataRepository;
 
-    public MainViewModel(@NonNull Application application) {
+    public ArticlesViewModel(@NonNull Application application) {
         super(application);
 
         dataRepository = new DataRepositoryImpl(new ApiHelper(),
                 ArticleRoomDatabase.getDatabase(application.getApplicationContext()));
     }
 
-    public void insert(Article article) {
+    public void insert(Article article) throws SQLiteConstraintException {
         dataRepository.insert(article);
     }
 
+    public void delete(Article article) {
+        dataRepository.delete(article);
+    }
 
-    public LiveData<List<Article>> getArticlesData() {
+    public LiveData<List<Article>> getArticlesFromDb() {
+        return dataRepository.getArticlesLocal();
+    }
+
+    public LiveData<List<Article>> getArticlesFromWeb() {
         final MutableLiveData<List<Article>> articles = new MutableLiveData<>();
 
         Single<ApiResponse> observable = dataRepository.getArticlesRemote()

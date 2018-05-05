@@ -1,6 +1,7 @@
 package com.example.goran.mvvm_demo.data;
 
 import android.arch.lifecycle.LiveData;
+import android.database.sqlite.SQLiteConstraintException;
 
 import com.example.goran.mvvm_demo.data.local.ArticleRoomDatabase;
 import com.example.goran.mvvm_demo.data.remote.ApiHelper;
@@ -32,7 +33,7 @@ public class DataRepositoryImpl implements DataRepository {
     }
 
     @Override
-    public void insert(Article article) {
+    public void insert(Article article) throws SQLiteConstraintException {
         database.articleDao().insert(article);
     }
 

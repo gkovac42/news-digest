@@ -3,13 +3,16 @@ package com.example.goran.mvvm_demo.ui;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.database.sqlite.SQLiteConstraintException;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.goran.mvvm_demo.R;
@@ -20,7 +23,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ArticleAdapter adapter;
-    private MainViewModel viewModel;
+    private ArticlesViewModel viewModel;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,18 +41,22 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLongClick(Article article) {
-                viewModel.insert(article);
-                Toast.makeText(MainActivity.this, "archived", Toast.LENGTH_SHORT).show();
+                try {
+                    viewModel.insert(article);
+                    showInsertSnackbar(article);
+                } catch (SQLiteConstraintException e) {
+                    showErrorToast();
+                }
             }
         });
 
-        RecyclerView recyclerView = findViewById(R.id.recycler);
+        recyclerView = findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
 
-        viewModel.getArticlesData().observe(this, new Observer<List<Article>>() {
+        viewModel.getArticlesFromWeb().observe(this, new Observer<List<Article>>() {
             @Override
             public void onChanged(@Nullable List<Article> articles) {
                 adapter.setArticles(articles);
@@ -71,5 +79,20 @@ public class MainActivity extends AppCompatActivity {
             startActivity(ArchiveActivity.newIntent(this));
         }
         return false;
+    }
+
+    private void showInsertSnackbar(final Article article) {
+        Snackbar.make(recyclerView, "Article archived.", Snackbar.LENGTH_LONG)
+                .setAction("UNDO", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        viewModel.delete(article);
+                    }
+                })
+                .show();
+    }
+
+    private void showErrorToast() {
+        Toast.makeText(MainActivity.this, "Already in archive!", Toast.LENGTH_SHORT).show();
     }
 }

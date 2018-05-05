@@ -1,6 +1,7 @@
 package com.example.goran.mvvm_demo.data;
 
 import android.arch.lifecycle.LiveData;
+import android.database.sqlite.SQLiteConstraintException;
 
 import com.example.goran.mvvm_demo.data.remote.model.ApiResponse;
 import com.example.goran.mvvm_demo.data.remote.model.Article;
@@ -15,7 +16,7 @@ public interface DataRepository {
 
     LiveData<List<Article>> getArticlesLocal();
 
-    void insert(Article article);
+    void insert(Article article) throws SQLiteConstraintException;
 
     void delete(Article article);
 

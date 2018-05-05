@@ -6,10 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
+import android.view.View;
 
 import com.example.goran.mvvm_demo.R;
 import com.example.goran.mvvm_demo.data.remote.model.Article;
@@ -19,7 +20,8 @@ import java.util.List;
 public class ArchiveActivity extends AppCompatActivity {
 
     private ArticleAdapter adapter;
-    private ArchiveViewModel viewModel;
+    private ArticlesViewModel viewModel;
+    private RecyclerView recyclerView;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, ArchiveActivity.class);
@@ -41,22 +43,33 @@ public class ArchiveActivity extends AppCompatActivity {
             @Override
             public void onLongClick(Article article) {
                 viewModel.delete(article);
-                Toast.makeText(ArchiveActivity.this, "deleted", Toast.LENGTH_SHORT).show();
+                showDeleteSnackbar(article);
             }
         });
 
-        RecyclerView recyclerView = findViewById(R.id.recycler);
+        recyclerView = findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        viewModel = ViewModelProviders.of(this).get(ArchiveViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
 
-        viewModel.getArticles().observe(this, new Observer<List<Article>>() {
+        viewModel.getArticlesFromDb().observe(this, new Observer<List<Article>>() {
             @Override
             public void onChanged(@Nullable List<Article> articles) {
                 adapter.setArticles(articles);
                 adapter.notifyDataSetChanged();
             }
         });
+    }
+
+    private void showDeleteSnackbar(final Article article) {
+        Snackbar.make(recyclerView, "Article deleted.", Snackbar.LENGTH_LONG)
+                .setAction("UNDO", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        viewModel.insert(article);
+                    }
+                })
+                .show();
     }
 }
