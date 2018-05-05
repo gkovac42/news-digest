@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">mvvm-demo</string>
+    <string name="title_activity_archive">ArchiveActivity</string>
+    <string name="title_home">Go to Archive</string>
+    <string name="title_dashboard">Delete</string>
+    <string name="title_notifications">Notifications</string>
+
+    <string name="title_activity_article">ArticleActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+</resources>
