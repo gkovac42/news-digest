@@ -1,4 +1,4 @@
-package com.example.goran.mvvm_demo.data.remote.model;
+package com.example.goran.mvvm_demo.data.model;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;

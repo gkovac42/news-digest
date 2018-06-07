@@ -1,6 +1,6 @@
 package com.example.goran.mvvm_demo.data.remote;
 
-import com.example.goran.mvvm_demo.data.remote.model.ApiResponse;
+import com.example.goran.mvvm_demo.data.model.ApiResponse;
 
 import io.reactivex.Single;
 import retrofit2.Retrofit;

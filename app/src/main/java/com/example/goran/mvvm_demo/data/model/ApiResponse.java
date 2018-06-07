@@ -1,4 +1,4 @@
-package com.example.goran.mvvm_demo.data.remote.model;
+package com.example.goran.mvvm_demo.data.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

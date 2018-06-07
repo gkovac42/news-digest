@@ -3,8 +3,8 @@ package com.example.goran.mvvm_demo.data;
 import android.arch.lifecycle.LiveData;
 import android.database.sqlite.SQLiteConstraintException;
 
-import com.example.goran.mvvm_demo.data.remote.model.ApiResponse;
-import com.example.goran.mvvm_demo.data.remote.model.Article;
+import com.example.goran.mvvm_demo.data.model.ApiResponse;
+import com.example.goran.mvvm_demo.data.model.Article;
 
 import java.util.List;
 

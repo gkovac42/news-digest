@@ -1,4 +1,4 @@
-package com.example.goran.mvvm_demo.ui;
+package com.example.goran.mvvm_demo.ui.article;
 
 import android.content.Context;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package com.example.goran.mvvm_demo.ui;
+package com.example.goran.mvvm_demo.ui.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.goran.mvvm_demo.R;
-import com.example.goran.mvvm_demo.data.remote.model.Article;
+import com.example.goran.mvvm_demo.data.model.Article;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHolder> {
 
     private List<Article> articles;
-    private AdapterListener listener;
+    private ClickListener listener;
     private Context context;
 
     public ArticleAdapter(Context context) {
@@ -35,14 +35,14 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
         return articles;
     }
 
-    interface AdapterListener {
+    public interface ClickListener {
 
         void onClick(String articleUrl);
 
         void onLongClick(Article article);
     }
 
-    public void setListener(AdapterListener listener) {
+    public void setListener(ClickListener listener) {
         this.listener = listener;
     }
 

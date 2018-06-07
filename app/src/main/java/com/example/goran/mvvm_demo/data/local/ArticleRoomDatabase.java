@@ -5,7 +5,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
-import com.example.goran.mvvm_demo.data.remote.model.Article;
+import com.example.goran.mvvm_demo.data.model.Article;
 
 @Database(entities = Article.class, version = 1, exportSchema = false)
 public abstract class ArticleRoomDatabase extends RoomDatabase {
