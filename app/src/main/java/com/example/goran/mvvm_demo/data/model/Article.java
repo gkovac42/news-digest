@@ -2,9 +2,7 @@ package com.example.goran.mvvm_demo.data.model;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -12,14 +10,10 @@ import com.google.gson.annotations.SerializedName;
 @Entity(tableName = "article_table")
 public class Article {
 
-    @SerializedName("author")
-    @Expose
-    @Ignore
-    private Object author;
+    @PrimaryKey(autoGenerate = true)
+    private long id;
     @SerializedName("title")
     @Expose
-    @PrimaryKey
-    @NonNull
     @ColumnInfo(name = "title")
     private String title;
     @SerializedName("description")
@@ -36,16 +30,18 @@ public class Article {
     private String urlToImage;
     @SerializedName("publishedAt")
     @Expose
-    @Ignore
+    @ColumnInfo(name = "published_at")
     private String publishedAt;
 
-
-    public Object getAuthor() {
-        return author;
+    public Article() {
     }
 
-    public void setAuthor(Object author) {
-        this.author = author;
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -82,6 +78,18 @@ public class Article {
 
     public String getPublishedAt() {
         return publishedAt;
+    }
+
+    public String getPublishedAtFormatted() {
+        try {
+            String date = publishedAt.substring(0, 10);
+            String time = publishedAt.substring(11, 16);
+
+            return date + " at " + time;
+
+        } catch (Exception e) {
+            return "publication date unknown";
+        }
     }
 
     public void setPublishedAt(String publishedAt) {

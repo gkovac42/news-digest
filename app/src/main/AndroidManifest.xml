@@ -20,12 +20,19 @@
         </activity>
         <activity
             android:name=".ui.archive.ArchiveActivity"
-            android:label="@string/title_activity_archive" />
+            android:label="@string/title_activity_archive"
+            android:parentActivityName=".ui.main.MainActivity">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.main.MainActivity" />
+        </activity>
+
         <activity
             android:name=".ui.article.ArticleActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_article"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
 
 </manifest>

@@ -5,19 +5,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.example.goran.mvvm_demo.R;
 import com.example.goran.mvvm_demo.data.model.Article;
+import com.example.goran.mvvm_demo.ui.ArticlesViewModel;
 import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter;
 import com.example.goran.mvvm_demo.ui.article.ArticleActivity;
 
 public class ArchiveActivity extends AppCompatActivity {
 
+    private ArticlesViewModel viewModel;
     private ArticleAdapter adapter;
-    private ArchiveViewModel viewModel;
     private RecyclerView recyclerView;
 
     public static Intent newIntent(Context context) {
@@ -28,31 +35,100 @@ public class ArchiveActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        adapter = new ArticleAdapter(this);
-        adapter.setListener(new ArticleAdapter.ClickListener() {
+        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.container_swipe_refresh);
+        swipeRefreshLayout.setEnabled(false);
+
+        initAdapter();
+
+        initRecyclerView();
+
+        viewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
+
+        getArticlesFromDb();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.archive, menu);
+
+        MenuItem searchMenuItem = menu.findItem(R.id.archive_menu_search);
+
+        SearchView searchView = (SearchView) searchMenuItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onClick(String articleUrl) {
-                navigateToArticle(articleUrl);
+            public boolean onQueryTextSubmit(String query) {
+                performSearch(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                String query = searchView.getQuery().toString();
+
+                if (query.length() > 2) {
+                    performSearch(query);
+
+                } else if (query.isEmpty()) {
+                    getArticlesFromDb();
+                }
+                return false;
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_clear) {
+            showClearDialog();
+        }
+        return true;
+    }
+
+    private void initAdapter() {
+        adapter = new ArticleAdapter();
+        adapter.setListener(new ArticleAdapter.AdapterListener() {
+            @Override
+            public void onClick(Article article) {
+                navigateToArticle(article.getUrl());
             }
 
             @Override
             public void onLongClick(Article article) {
-                viewModel.delete(article);
+                viewModel.deleteFromDb(article);
                 showDeleteSnackbar(article);
             }
         });
+    }
 
+    private void initRecyclerView() {
         recyclerView = findViewById(R.id.recycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        DividerItemDecoration divider = new DividerItemDecoration(this, layoutManager.getOrientation());
+        recyclerView.addItemDecoration(divider);
+
+        recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
+    }
 
-        viewModel = ViewModelProviders.of(this).get(ArchiveViewModel.class);
-
+    private void getArticlesFromDb() {
         viewModel.getArticlesFromDb().observe(this, articles -> {
             adapter.setArticles(articles);
             adapter.notifyDataSetChanged();
         });
+    }
+
+    private void performSearch(String query) {
+        viewModel.searchArticlesByTitle(query)
+                .observe(ArchiveActivity.this, articles -> {
+                    adapter.setArticles(articles);
+                    adapter.notifyDataSetChanged();
+                });
     }
 
     private void navigateToArticle(String articleUrl) {
@@ -61,8 +137,18 @@ public class ArchiveActivity extends AppCompatActivity {
     }
 
     private void showDeleteSnackbar(final Article article) {
-        Snackbar.make(recyclerView, "Article deleted.", Snackbar.LENGTH_LONG)
-                .setAction("UNDO", view -> viewModel.insert(article))
+        Snackbar.make(recyclerView, R.string.msg_removed, Snackbar.LENGTH_LONG)
+                .setAction(R.string.action_undo, view -> viewModel.insertIntoDb(article))
+                .show();
+    }
+
+    private void showClearDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Caution!")
+                .setMessage(R.string.msg_clear)
+                .setPositiveButton(R.string.action_yes, (dialogInterface, i) -> viewModel.clearDb())
+                .setNegativeButton(R.string.action_no, null)
+                .create()
                 .show();
     }
 }

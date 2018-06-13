@@ -13,8 +13,11 @@ import java.util.List;
 @Dao
 public interface ArticleDao {
 
-    @Query("SELECT * FROM article_table ORDER BY title ASC")
-    LiveData<List<Article>> getArticlesByTitle();
+    @Query("SELECT * FROM article_table ORDER BY :orderBy ASC")
+    LiveData<List<Article>> getAll(String orderBy);
+
+    @Query("SELECT * FROM article_table WHERE title LIKE '%' || :query || '%'")
+    LiveData<List<Article>> searchByTitle(String query);
 
     @Insert
     void insert(Article article);

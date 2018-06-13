@@ -1,6 +1,5 @@
 package com.example.goran.mvvm_demo.ui.adapters;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,30 +18,17 @@ import java.util.List;
 public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHolder> {
 
     private List<Article> articles;
-    private ClickListener listener;
-    private Context context;
+    private AdapterListener listener;
 
-    public ArticleAdapter(Context context) {
-        this.articles = new ArrayList<>();
-        this.context = context;
+    public ArticleAdapter() {
+        articles = new ArrayList<>();
     }
 
     public void setArticles(List<Article> articles) {
         this.articles = articles;
     }
 
-    public List<Article> getArticles() {
-        return articles;
-    }
-
-    public interface ClickListener {
-
-        void onClick(String articleUrl);
-
-        void onLongClick(Article article);
-    }
-
-    public void setListener(ClickListener listener) {
+    public void setListener(AdapterListener listener) {
         this.listener = listener;
     }
 
@@ -56,14 +42,22 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         View itemView = holder.itemView;
+        Article article = articles.get(position);
 
         TextView txtTitle = itemView.findViewById(R.id.txt_item_title);
-        txtTitle.setText(articles.get(position).getTitle());
+        txtTitle.setText(article.getTitle());
+
+        TextView txtDescription = itemView.findViewById(R.id.txt_item_desc);
+        txtDescription.setText(article.getDescription());
+
+        TextView txtDate = itemView.findViewById(R.id.txt_item_date);
+        txtDate.setText(article.getPublishedAtFormatted());
 
         ImageView imgThumb = itemView.findViewById(R.id.img_item_thumbnail);
 
-        Glide.with(context)
-                .load(articles.get(position).getUrlToImage())
+        Glide.with(holder.itemView.getContext())
+                .load(article.getUrlToImage())
+                .placeholder(R.drawable.ic_info_outline_black_24dp)
                 .centerCrop()
                 .into(imgThumb);
     }
@@ -83,22 +77,24 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
             this.itemView = itemView;
 
-            this.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    String url = articles.get(getAdapterPosition()).getUrl();
-                    listener.onClick(url);
-                }
+            this.itemView.setOnClickListener(view -> {
+                Article article = articles.get(getAdapterPosition());
+                listener.onClick(article);
             });
 
-            this.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    Article article = articles.get(getAdapterPosition());
-                    listener.onLongClick(article);
-                    return true;
-                }
+            this.itemView.setOnLongClickListener(view -> {
+                Article article = articles.get(getAdapterPosition());
+                listener.onLongClick(article);
+
+                return true;
             });
         }
+    }
+
+    public interface AdapterListener {
+
+        void onClick(Article article);
+
+        void onLongClick(Article article);
     }
 }

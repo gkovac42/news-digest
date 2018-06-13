@@ -1,11 +1,16 @@
 <resources>
-    <string name="app_name">mvvm-demo</string>
-    <string name="title_activity_archive">ArchiveActivity</string>
-    <string name="title_home">Go to Archive</string>
-    <string name="title_dashboard">Delete</string>
-    <string name="title_notifications">Notifications</string>
-
+    <string name="app_name">Hacker News Digest</string>
+    <string name="title_activity_archive">Archive</string>
     <string name="title_activity_article">ArticleActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="action_menu_search">Search</string>
+    <string name="action_menu_clear">Clear</string>
+    <string name="action_menu_archive">Go to Archive</string>
+    <string name="action_yes">Yes</string>
+    <string name="action_no">No</string>
+    <string name="action_undo">Undo</string>
+    <string name="msg_clear">Are you sure you want to delete all archived articles?</string>
+    <string name="msg_removed">Article removed.</string>
+    <string name="msg_archived">Article archived.</string>
+    <string name="msg_already_archived">Already in archive!</string>
 </resources>

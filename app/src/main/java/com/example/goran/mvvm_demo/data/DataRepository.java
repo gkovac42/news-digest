@@ -1,25 +1,58 @@
 package com.example.goran.mvvm_demo.data;
 
 import android.arch.lifecycle.LiveData;
+import android.content.Context;
 import android.database.sqlite.SQLiteConstraintException;
 
+import com.example.goran.mvvm_demo.data.local.ArticleRoomDatabase;
 import com.example.goran.mvvm_demo.data.model.ApiResponse;
 import com.example.goran.mvvm_demo.data.model.Article;
+import com.example.goran.mvvm_demo.data.remote.ApiHelper;
 
 import java.util.List;
 
-import io.reactivex.Single;
+import retrofit2.Call;
 
-public interface DataRepository {
+public class DataRepository {
 
-    Single<ApiResponse> getArticlesRemote();
+    private ApiHelper apiHelper;
+    private ArticleRoomDatabase database;
+    private static DataRepository instance;
 
-    LiveData<List<Article>> getArticlesLocal();
+    private DataRepository(ApiHelper apiHelper, ArticleRoomDatabase database) {
+        this.apiHelper = apiHelper;
+        this.database = database;
+    }
 
-    void insert(Article article) throws SQLiteConstraintException;
+    public static DataRepository getInstance(Context context) {
+        if (instance == null) {
+            instance = new DataRepository(new ApiHelper(),
+                    ArticleRoomDatabase.getDatabase(context));
+        }
+        return instance;
+    }
 
-    void delete(Article article);
+    public Call<ApiResponse> getArticlesFromApi() {
+        return apiHelper.getArticles();
+    }
 
-    void deleteAll();
+    public LiveData<List<Article>> getArticlesFromDb() {
+        return database.articleDao().getAll("title");
+    }
 
+    public LiveData<List<Article>> searchDbByTitle(String query) {
+        return database.articleDao().searchByTitle(query);
+    }
+
+    public void insertIntoDb(Article article) throws SQLiteConstraintException {
+        database.articleDao().insert(article);
+    }
+
+    public void deleteFromDb(Article article) {
+        database.articleDao().delete(article);
+    }
+
+    public void deleteAll() {
+        database.articleDao().deleteAll();
+    }
 }
