@@ -11,6 +11,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ui.articles.ArticlesActivity" />
+        <activity
+            android:name=".ui.articles.ArchiveActivity"
+            android:label="@string/title_activity_archive" />
+        <activity
+            android:name=".ui.articles.ReaderActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_article"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".ui.sources.SourcesActivity"
+            android:label="@string/title_activity_sources" />
         <activity android:name=".ui.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,20 +31,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.archive.ArchiveActivity"
-            android:label="@string/title_activity_archive"
-            android:parentActivityName=".ui.main.MainActivity">
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.main.MainActivity" />
-        </activity>
+            android:name=".ui.articles.SearchActivity"
+            android:label="@string/title_activity_search" />
 
-        <activity
-            android:name=".ui.article.ArticleActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_article"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
     </application>
 
 </manifest>

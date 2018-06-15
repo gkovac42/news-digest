@@ -5,8 +5,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteConstraintException;
 
 import com.example.goran.mvvm_demo.data.local.ArticleRoomDatabase;
-import com.example.goran.mvvm_demo.data.model.ApiResponse;
 import com.example.goran.mvvm_demo.data.model.Article;
+import com.example.goran.mvvm_demo.data.model.ArticlesResponse;
+import com.example.goran.mvvm_demo.data.model.SourcesResponse;
 import com.example.goran.mvvm_demo.data.remote.ApiHelper;
 
 import java.util.List;
@@ -32,8 +33,16 @@ public class DataRepository {
         return instance;
     }
 
-    public Call<ApiResponse> getArticlesFromApi() {
-        return apiHelper.getArticles();
+    public Call<SourcesResponse> getSourcesFromApi() {
+        return apiHelper.getSources();
+    }
+
+    public Call<ArticlesResponse> getArticlesFromApi(String source) {
+        return apiHelper.getArticles(source);
+    }
+
+    public Call<ArticlesResponse> searchApiForArticles(String query) {
+        return apiHelper.searchArticles(query);
     }
 
     public LiveData<List<Article>> getArticlesFromDb() {

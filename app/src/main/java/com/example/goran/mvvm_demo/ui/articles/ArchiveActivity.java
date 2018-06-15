@@ -1,4 +1,4 @@
-package com.example.goran.mvvm_demo.ui.archive;
+package com.example.goran.mvvm_demo.ui.articles;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,11 +16,11 @@ import android.view.MenuItem;
 
 import com.example.goran.mvvm_demo.R;
 import com.example.goran.mvvm_demo.data.model.Article;
-import com.example.goran.mvvm_demo.ui.ArticlesViewModel;
 import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter;
-import com.example.goran.mvvm_demo.ui.article.ArticleActivity;
+import com.example.goran.mvvm_demo.ui.adapters.SimpleArticleAdapter;
+import com.example.goran.mvvm_demo.ui.BaseActivity;
 
-public class ArchiveActivity extends AppCompatActivity {
+public class ArchiveActivity extends BaseActivity {
 
     private ArticlesViewModel viewModel;
     private ArticleAdapter adapter;
@@ -34,8 +33,10 @@ public class ArchiveActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.activity_articles);
+
+        setActionBarColor(R.color.colorBlue);
+        setStatusBarColor(R.color.colorBlueDark);
 
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.container_swipe_refresh);
         swipeRefreshLayout.setEnabled(false);
@@ -88,7 +89,7 @@ public class ArchiveActivity extends AppCompatActivity {
     }
 
     private void initAdapter() {
-        adapter = new ArticleAdapter();
+        adapter = new SimpleArticleAdapter();
         adapter.setListener(new ArticleAdapter.AdapterListener() {
             @Override
             public void onClick(Article article) {
@@ -104,14 +105,12 @@ public class ArchiveActivity extends AppCompatActivity {
     }
 
     private void initRecyclerView() {
-        recyclerView = findViewById(R.id.recycler);
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
         DividerItemDecoration divider = new DividerItemDecoration(this, layoutManager.getOrientation());
-        recyclerView.addItemDecoration(divider);
 
+        recyclerView = findViewById(R.id.recycler_articles);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(divider);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
     }
@@ -124,7 +123,7 @@ public class ArchiveActivity extends AppCompatActivity {
     }
 
     private void performSearch(String query) {
-        viewModel.searchArticlesByTitle(query)
+        viewModel.searchDbByTitle(query)
                 .observe(ArchiveActivity.this, articles -> {
                     adapter.setArticles(articles);
                     adapter.notifyDataSetChanged();
@@ -132,7 +131,7 @@ public class ArchiveActivity extends AppCompatActivity {
     }
 
     private void navigateToArticle(String articleUrl) {
-        Intent intent = ArticleActivity.newIntent(ArchiveActivity.this, articleUrl);
+        Intent intent = ReaderActivity.newIntent(ArchiveActivity.this, articleUrl);
         startActivity(intent);
     }
 

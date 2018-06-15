@@ -28,6 +28,10 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
         this.articles = articles;
     }
 
+    public List<Article> getArticles() {
+        return articles;
+    }
+
     public void setListener(AdapterListener listener) {
         this.listener = listener;
     }
@@ -35,7 +39,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_article, parent, false);
+
         return new ViewHolder(itemView);
     }
 
@@ -50,15 +56,12 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
         TextView txtDescription = itemView.findViewById(R.id.txt_item_desc);
         txtDescription.setText(article.getDescription());
 
-        TextView txtDate = itemView.findViewById(R.id.txt_item_date);
-        txtDate.setText(article.getPublishedAtFormatted());
-
         ImageView imgThumb = itemView.findViewById(R.id.img_item_thumbnail);
 
         Glide.with(holder.itemView.getContext())
                 .load(article.getUrlToImage())
-                .placeholder(R.drawable.ic_info_outline_black_24dp)
-                .centerCrop()
+                .error(R.drawable.ic_info_outline_black_24dp)
+                .override(320, 180)
                 .into(imgThumb);
     }
 
@@ -70,22 +73,18 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        private View itemView;
+        View itemView;
 
         ViewHolder(View itemView) {
             super(itemView);
 
             this.itemView = itemView;
 
-            this.itemView.setOnClickListener(view -> {
-                Article article = articles.get(getAdapterPosition());
-                listener.onClick(article);
-            });
+            this.itemView.setOnClickListener(
+                    view -> listener.onClick(articles.get(getAdapterPosition())));
 
             this.itemView.setOnLongClickListener(view -> {
-                Article article = articles.get(getAdapterPosition());
-                listener.onLongClick(article);
-
+                listener.onLongClick(articles.get(getAdapterPosition()));
                 return true;
             });
         }

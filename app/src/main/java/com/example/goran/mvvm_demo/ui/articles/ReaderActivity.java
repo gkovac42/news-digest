@@ -1,4 +1,4 @@
-package com.example.goran.mvvm_demo.ui.article;
+package com.example.goran.mvvm_demo.ui.articles;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,12 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.webkit.WebView;
 
 
-public class ArticleActivity extends AppCompatActivity {
+public class ReaderActivity extends AppCompatActivity {
 
     public static final String EXTRA_URL = "url";
 
     public static Intent newIntent(Context context, String url) {
-        Intent intent = new Intent(context, ArticleActivity.class);
+        Intent intent = new Intent(context, ReaderActivity.class);
         intent.putExtra(EXTRA_URL, url);
         return intent;
     }

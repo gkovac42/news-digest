@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">Hacker News Digest</string>
+    <string name="app_name">News Digest</string>
     <string name="title_activity_archive">Archive</string>
     <string name="title_activity_article">ArticleActivity</string>
+    <string name="title_activity_search">News Digest - Search</string>
+    <string name="title_activity_sources">News Digest - Sources</string>
 
     <string name="action_menu_search">Search</string>
     <string name="action_menu_clear">Clear</string>
@@ -13,4 +15,10 @@
     <string name="msg_removed">Article removed.</string>
     <string name="msg_archived">Article archived.</string>
     <string name="msg_already_archived">Already in archive!</string>
+    <string name="main_menu_settings">Settings</string>
+    <string name="main_menu_search">Search</string>
+    <string name="main_menu_archive">Archive</string>
+    <string name="main_menu_news">News</string>
+    <string name="hint_query">Enter query…</string>
+    <string name="msg_query_short">query too short!</string>
 </resources>
