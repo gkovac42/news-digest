@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,12 +12,16 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.example.goran.mvvm_demo.R;
 import com.example.goran.mvvm_demo.data.model.Article;
+import com.example.goran.mvvm_demo.ui.BaseActivity;
 import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter;
 import com.example.goran.mvvm_demo.ui.adapters.SimpleArticleAdapter;
-import com.example.goran.mvvm_demo.ui.BaseActivity;
+
+import java.util.List;
 
 public class ArchiveActivity extends BaseActivity {
 
@@ -33,21 +36,21 @@ public class ArchiveActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_articles);
+        setContentView(R.layout.activity_list);
 
         setActionBarColor(R.color.colorBlue);
         setStatusBarColor(R.color.colorBlueDark);
-
-        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.container_swipe_refresh);
-        swipeRefreshLayout.setEnabled(false);
 
         initAdapter();
 
         initRecyclerView();
 
         viewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
-
-        getArticlesFromDb();
+        viewModel.getArticlesFromDb().observe(this, articles -> {
+            ProgressBar progressBar = findViewById(R.id.progress_list);
+            progressBar.setVisibility(View.GONE);
+            updateAdapter(articles);
+        });
     }
 
     @Override
@@ -72,12 +75,17 @@ public class ArchiveActivity extends BaseActivity {
                     performSearch(query);
 
                 } else if (query.isEmpty()) {
-                    getArticlesFromDb();
+                    viewModel.getArticlesFromDb()
+                            .observe(ArchiveActivity.this, ArchiveActivity.this::updateAdapter);
                 }
                 return false;
             }
         });
         return true;
+    }
+
+    private void performSearch(String query) {
+        viewModel.searchDbByTitle(query).observe(this, this::updateAdapter);
     }
 
     @Override
@@ -108,26 +116,16 @@ public class ArchiveActivity extends BaseActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         DividerItemDecoration divider = new DividerItemDecoration(this, layoutManager.getOrientation());
 
-        recyclerView = findViewById(R.id.recycler_articles);
+        recyclerView = findViewById(R.id.recycler_list);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(divider);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
     }
 
-    private void getArticlesFromDb() {
-        viewModel.getArticlesFromDb().observe(this, articles -> {
-            adapter.setArticles(articles);
-            adapter.notifyDataSetChanged();
-        });
-    }
-
-    private void performSearch(String query) {
-        viewModel.searchDbByTitle(query)
-                .observe(ArchiveActivity.this, articles -> {
-                    adapter.setArticles(articles);
-                    adapter.notifyDataSetChanged();
-                });
+    private void updateAdapter(List<Article> articles) {
+        adapter.setArticles(articles);
+        adapter.notifyDataSetChanged();
     }
 
     private void navigateToArticle(String articleUrl) {

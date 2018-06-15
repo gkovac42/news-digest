@@ -6,11 +6,13 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.example.goran.mvvm_demo.R;
 import com.example.goran.mvvm_demo.data.model.Source;
-import com.example.goran.mvvm_demo.ui.adapters.SourceAdapter;
 import com.example.goran.mvvm_demo.ui.BaseActivity;
+import com.example.goran.mvvm_demo.ui.adapters.SourceAdapter;
 import com.example.goran.mvvm_demo.ui.articles.ArticlesActivity;
 
 import java.util.List;
@@ -22,7 +24,7 @@ public class SourcesActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sources);
+        setContentView(R.layout.activity_list);
 
         setActionBarColor(R.color.colorRed);
         setStatusBarColor(R.color.colorRedDark);
@@ -41,6 +43,9 @@ public class SourcesActivity extends BaseActivity {
     }
 
     private void updateAdapter(List<Source> sources) {
+        ProgressBar progressBar = findViewById(R.id.progress_list);
+        progressBar.setVisibility(View.GONE);
+
         adapter.setSources(sources);
         adapter.notifyDataSetChanged();
     }
@@ -49,7 +54,7 @@ public class SourcesActivity extends BaseActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         DividerItemDecoration divider = new DividerItemDecoration(this, layoutManager.getOrientation());
 
-        RecyclerView recyclerView = findViewById(R.id.recycler_sources);
+        RecyclerView recyclerView = findViewById(R.id.recycler_list);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(divider);
         recyclerView.setHasFixedSize(true);

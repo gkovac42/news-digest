@@ -8,15 +8,17 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.goran.mvvm_demo.R;
 import com.example.goran.mvvm_demo.data.model.Article;
-import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter;
 import com.example.goran.mvvm_demo.ui.BaseActivity;
+import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter;
 
 public class SearchActivity extends BaseActivity {
 
@@ -24,6 +26,7 @@ public class SearchActivity extends BaseActivity {
     private ArticleAdapter adapter;
     private EditText txtSearchQuery;
     private RecyclerView recyclerView;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,8 @@ public class SearchActivity extends BaseActivity {
 
         setActionBarColor(R.color.colorGreen);
         setStatusBarColor(R.color.colorGreenDark);
+
+        progressBar = findViewById(R.id.progress_search);
 
         initSearchComponents();
 
@@ -44,17 +49,33 @@ public class SearchActivity extends BaseActivity {
 
     private void initSearchComponents() {
         txtSearchQuery = findViewById(R.id.txt_search_query);
+        txtSearchQuery.setOnEditorActionListener((textView, i, keyEvent) -> {
+            if (i == EditorInfo.IME_ACTION_SEARCH) {
+                String query = txtSearchQuery.getText().toString();
 
-        ImageButton btnSearch = findViewById(R.id.btn_search);
-        btnSearch.setOnClickListener(view -> {
-            String query = txtSearchQuery.getText().toString();
-            if (query.length() > 2) {
-                updateAdapter(query);
-                hideSoftKeyboard();
-            } else {
-                Toast.makeText(this, R.string.msg_query_short, Toast.LENGTH_SHORT).show();
+                if (query.length() > 2) {
+                    showProgressBar();
+                    updateAdapter(query);
+                    hideSoftKeyboard();
+
+                } else {
+                    Toast.makeText(SearchActivity.this,
+                            R.string.msg_query_short,
+                            Toast.LENGTH_SHORT)
+                            .show();
+                }
             }
+            return false;
         });
+    }
+
+    private void updateAdapter(String query) {
+        viewModel.searchApiForArticles(query)
+                .observe(this, articles -> {
+                    adapter.setArticles(articles);
+                    adapter.notifyDataSetChanged();
+                    hideProgressBar();
+                });
     }
 
     private void hideSoftKeyboard() {
@@ -103,11 +124,13 @@ public class SearchActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    private void updateAdapter(String query) {
-        viewModel.searchApiForArticles(query)
-                .observe(this, articles -> {
-                    adapter.setArticles(articles);
-                    adapter.notifyDataSetChanged();
-                });
+    private void showProgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+        txtSearchQuery.setVisibility(View.GONE);
+    }
+
+    private void hideProgressBar() {
+        progressBar.setVisibility(View.GONE);
+        txtSearchQuery.setVisibility(View.VISIBLE);
     }
 }
