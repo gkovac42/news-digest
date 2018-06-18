@@ -23,7 +23,7 @@ public class SimpleArticleAdapter extends ArticleAdapter {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         View itemView = holder.itemView;
-        Article article = getArticles().get(position);
+        Article article = getItem(position);
 
         TextView txtTitle = itemView.findViewById(R.id.txt_item_title_s);
         txtTitle.setText(article.getTitle());
@@ -33,7 +33,7 @@ public class SimpleArticleAdapter extends ArticleAdapter {
         Glide.with(holder.itemView.getContext())
                 .load(article.getUrlToImage())
                 .error(R.drawable.ic_info_outline_black_24dp)
-                .override(150,150)
+                .override(120,120)
                 .into(imgThumb);
     }
 }

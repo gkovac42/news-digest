@@ -72,7 +72,7 @@ public class SearchActivity extends BaseActivity {
     private void updateAdapter(String query) {
         viewModel.searchApiForArticles(query)
                 .observe(this, articles -> {
-                    adapter.setArticles(articles);
+                    adapter.submitList(articles);
                     adapter.notifyDataSetChanged();
                     hideProgressBar();
                 });
@@ -126,7 +126,7 @@ public class SearchActivity extends BaseActivity {
 
     private void showProgressBar() {
         progressBar.setVisibility(View.VISIBLE);
-        txtSearchQuery.setVisibility(View.GONE);
+        txtSearchQuery.setVisibility(View.INVISIBLE);
     }
 
     private void hideProgressBar() {

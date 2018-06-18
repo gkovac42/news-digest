@@ -124,7 +124,7 @@ public class ArchiveActivity extends BaseActivity {
     }
 
     private void updateAdapter(List<Article> articles) {
-        adapter.setArticles(articles);
+        adapter.submitList(articles);
         adapter.notifyDataSetChanged();
     }
 

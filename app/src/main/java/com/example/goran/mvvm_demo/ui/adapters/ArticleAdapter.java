@@ -1,6 +1,7 @@
 package com.example.goran.mvvm_demo.ui.adapters;
 
 import android.support.annotation.NonNull;
+import android.support.v7.recyclerview.extensions.ListAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,24 +13,12 @@ import com.bumptech.glide.Glide;
 import com.example.goran.mvvm_demo.R;
 import com.example.goran.mvvm_demo.data.model.Article;
 
-import java.util.ArrayList;
-import java.util.List;
+public class ArticleAdapter extends ListAdapter<Article, ArticleAdapter.ViewHolder> {
 
-public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHolder> {
-
-    private List<Article> articles;
     private AdapterListener listener;
 
     public ArticleAdapter() {
-        articles = new ArrayList<>();
-    }
-
-    public void setArticles(List<Article> articles) {
-        this.articles = articles;
-    }
-
-    public List<Article> getArticles() {
-        return articles;
+        super(Article.DIFF_CALLBACK);
     }
 
     public void setListener(AdapterListener listener) {
@@ -48,7 +37,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         View itemView = holder.itemView;
-        Article article = articles.get(position);
+        Article article = getItem(position);
 
         TextView txtTitle = itemView.findViewById(R.id.txt_item_title);
         txtTitle.setText(article.getTitle());
@@ -61,15 +50,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
         Glide.with(holder.itemView.getContext())
                 .load(article.getUrlToImage())
                 .error(R.drawable.ic_info_outline_black_24dp)
-                .override(320, 180)
+                .override(360, 180)
                 .into(imgThumb);
     }
-
-    @Override
-    public int getItemCount() {
-        return articles.size();
-    }
-
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -79,12 +62,16 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             super(itemView);
 
             this.itemView = itemView;
-
-            this.itemView.setOnClickListener(
-                    view -> listener.onClick(articles.get(getAdapterPosition())));
+            this.itemView.setOnClickListener(view -> {
+                if (listener != null) {
+                    listener.onClick(getItem(getAdapterPosition()));
+                }
+            });
 
             this.itemView.setOnLongClickListener(view -> {
-                listener.onLongClick(articles.get(getAdapterPosition()));
+                if (listener != null) {
+                    listener.onLongClick(getItem(getAdapterPosition()));
+                }
                 return true;
             });
         }

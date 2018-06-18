@@ -1,5 +1,8 @@
 package com.example.goran.mvvm_demo.data.model;
 
+import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -82,4 +85,16 @@ public class Source {
     public void setCountry(String country) {
         this.country = country;
     }
+
+    public static final DiffUtil.ItemCallback<Source> DIFF_CALLBACK = new DiffUtil.ItemCallback<Source>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Source oldSource, @NonNull Source newSource) {
+            return oldSource.getId().equals(newSource.getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Source oldSource, @NonNull Source newSource) {
+            return oldSource.equals(newSource);
+        }
+    };
 }

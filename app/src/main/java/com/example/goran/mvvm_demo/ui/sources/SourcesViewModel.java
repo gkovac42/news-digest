@@ -4,12 +4,15 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
 import com.example.goran.mvvm_demo.data.DataRepository;
 import com.example.goran.mvvm_demo.data.model.Source;
 import com.example.goran.mvvm_demo.data.model.SourcesResponse;
+import com.example.goran.mvvm_demo.util.Category;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,5 +48,24 @@ public class SourcesViewModel extends AndroidViewModel {
         });
 
         return sourcesLiveData;
+    }
+
+    public LiveData<List<Source>> getSourcesByCategory(String category) {
+        if (category.equals(Category.ALL.toLowerCase())) {
+            return sourcesLiveData;
+
+        } else {
+            return Transformations.map(sourcesLiveData, input -> {
+
+                List<Source> filteredSources = new ArrayList<>();
+
+                for (Source s : input) {
+                    if (s.getCategory().equals(category)) {
+                        filteredSources.add(s);
+                    }
+                }
+                return filteredSources;
+            });
+        }
     }
 }

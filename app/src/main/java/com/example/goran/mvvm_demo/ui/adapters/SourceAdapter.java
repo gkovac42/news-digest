@@ -1,6 +1,7 @@
 package com.example.goran.mvvm_demo.ui.adapters;
 
 import android.support.annotation.NonNull;
+import android.support.v7.recyclerview.extensions.ListAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,20 +11,12 @@ import android.widget.TextView;
 import com.example.goran.mvvm_demo.R;
 import com.example.goran.mvvm_demo.data.model.Source;
 
-import java.util.ArrayList;
-import java.util.List;
+public class SourceAdapter extends ListAdapter<Source, SourceAdapter.ViewHolder> {
 
-public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder> {
-
-    private List<Source> sources;
     private AdapterListener listener;
 
     public SourceAdapter() {
-        sources = new ArrayList<>();
-    }
-
-    public void setSources(List<Source> sources) {
-        this.sources = sources;
+        super(Source.DIFF_CALLBACK);
     }
 
     public void setListener(AdapterListener listener) {
@@ -36,19 +29,13 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
 
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_source, parent, false);
 
-        return new ViewHolder(itemView) ;
+        return new ViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        View itemView = holder.itemView;
-        TextView txtSourceName = itemView.findViewById(R.id.txt_item_source_name);
-        txtSourceName.setText(sources.get(position).getName());
-    }
-
-    @Override
-    public int getItemCount() {
-        return sources.size();
+        TextView txtSourceName = holder.itemView.findViewById(R.id.txt_item_source_name);
+        txtSourceName.setText(getItem(position).getName());
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -60,7 +47,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
 
             this.itemView = itemView;
             this.itemView.setOnClickListener(
-                    view -> listener.onClick(sources.get(getAdapterPosition())));
+                    view -> listener.onClick(getItem(getAdapterPosition())));
         }
     }
 

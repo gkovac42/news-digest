@@ -8,8 +8,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -50,22 +48,6 @@ public class ArticlesActivity extends BaseActivity {
 
         viewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
         viewModel.getArticlesFromApi(sourceId).observe(this, this::updateAdapter);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.articles, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.main_menu_archive) {
-            startActivity(ArchiveActivity.newIntent(this));
-        }
-        return false;
     }
 
     private void initAdapter() {
@@ -111,7 +93,7 @@ public class ArticlesActivity extends BaseActivity {
         ProgressBar progressBar = findViewById(R.id.progress_list);
         progressBar.setVisibility(View.GONE);
 
-        adapter.setArticles(articles);
+        adapter.submitList(articles);
         adapter.notifyDataSetChanged();
     }
 

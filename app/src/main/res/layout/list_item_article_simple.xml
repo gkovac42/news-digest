@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/img_item_thumbnail_s"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

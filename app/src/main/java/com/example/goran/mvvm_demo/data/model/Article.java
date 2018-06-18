@@ -3,6 +3,8 @@ package com.example.goran.mvvm_demo.data.model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -10,8 +12,6 @@ import com.google.gson.annotations.SerializedName;
 @Entity(tableName = "article_table")
 public class Article {
 
-    @PrimaryKey(autoGenerate = true)
-    private long id;
     @SerializedName("title")
     @Expose
     @ColumnInfo(name = "title")
@@ -23,6 +23,8 @@ public class Article {
     @SerializedName("url")
     @Expose
     @ColumnInfo(name = "url")
+    @PrimaryKey
+    @NonNull
     private String url;
     @SerializedName("urlToImage")
     @Expose
@@ -34,14 +36,6 @@ public class Article {
     private String publishedAt;
 
     public Article() {
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -80,19 +74,19 @@ public class Article {
         return publishedAt;
     }
 
-    public String getPublishedAtFormatted() {
-        try {
-            String date = publishedAt.substring(0, 10);
-            String time = publishedAt.substring(11, 16);
-
-            return date + " at " + time;
-
-        } catch (Exception e) {
-            return "publication date unknown";
-        }
-    }
-
     public void setPublishedAt(String publishedAt) {
         this.publishedAt = publishedAt;
     }
+
+    public static final DiffUtil.ItemCallback<Article> DIFF_CALLBACK = new DiffUtil.ItemCallback<Article>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Article oldArticle, @NonNull Article newArticle) {
+            return oldArticle.getUrl().equals(newArticle.getUrl());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Article oldArticle, @NonNull Article newArticle) {
+            return oldArticle.equals(newArticle);
+        }
+    };
 }

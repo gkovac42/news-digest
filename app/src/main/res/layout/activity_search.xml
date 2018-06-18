@@ -17,8 +17,8 @@
 
         <ProgressBar
             android:id="@+id/progress_search"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_gravity="center"
             android:visibility="gone"/>
 
