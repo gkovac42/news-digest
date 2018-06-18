@@ -1,4 +1,4 @@
-package com.example.goran.mvvm_demo.ui.articles;
+package com.example.goran.mvvm_demo.ui.search;
 
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
@@ -19,10 +19,14 @@ import com.example.goran.mvvm_demo.R;
 import com.example.goran.mvvm_demo.data.model.Article;
 import com.example.goran.mvvm_demo.ui.BaseActivity;
 import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter;
+import com.example.goran.mvvm_demo.ui.articles.ReaderActivity;
+import com.example.goran.mvvm_demo.util.ErrorCodes;
+
+import java.util.List;
 
 public class SearchActivity extends BaseActivity {
 
-    private ArticlesViewModel viewModel;
+    private SearchViewModel viewModel;
     private ArticleAdapter adapter;
     private EditText txtSearchQuery;
     private RecyclerView recyclerView;
@@ -44,7 +48,19 @@ public class SearchActivity extends BaseActivity {
 
         initRecyclerView();
 
-        viewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(SearchViewModel.class);
+
+        viewModel.getArticlesLiveData().observe(this, articles -> {
+            updateAdapter(articles);
+            hideProgressBar();
+        });
+
+        viewModel.getErrorCodeLiveData().observe(this, errorCode -> {
+            if (errorCode != null && errorCode == ErrorCodes.NETWORK_ERROR) {
+                showNetworkError();
+                hideProgressBar();
+            }
+        });
     }
 
     private void initSearchComponents() {
@@ -54,8 +70,8 @@ public class SearchActivity extends BaseActivity {
                 String query = txtSearchQuery.getText().toString();
 
                 if (query.length() > 2) {
+                    viewModel.searchApiForArticles(query);
                     showProgressBar();
-                    updateAdapter(query);
                     hideSoftKeyboard();
 
                 } else {
@@ -67,15 +83,6 @@ public class SearchActivity extends BaseActivity {
             }
             return false;
         });
-    }
-
-    private void updateAdapter(String query) {
-        viewModel.searchApiForArticles(query)
-                .observe(this, articles -> {
-                    adapter.submitList(articles);
-                    adapter.notifyDataSetChanged();
-                    hideProgressBar();
-                });
     }
 
     private void hideSoftKeyboard() {
@@ -122,6 +129,10 @@ public class SearchActivity extends BaseActivity {
         recyclerView.addItemDecoration(divider);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
+    }
+
+    private void updateAdapter(List<Article> articles) {
+        adapter.submitList(articles);
     }
 
     private void showProgressBar() {

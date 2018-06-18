@@ -18,6 +18,7 @@ import com.example.goran.mvvm_demo.ui.BaseActivity;
 import com.example.goran.mvvm_demo.ui.adapters.SourceAdapter;
 import com.example.goran.mvvm_demo.ui.articles.ArticlesActivity;
 import com.example.goran.mvvm_demo.util.Category;
+import com.example.goran.mvvm_demo.util.ErrorCodes;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class SourcesActivity extends BaseActivity {
 
     private SourceAdapter adapter;
     private SourcesViewModel viewModel;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,8 @@ public class SourcesActivity extends BaseActivity {
         setActionBarColor(R.color.colorRed);
         setStatusBarColor(R.color.colorRedDark);
 
+        progressBar = findViewById(R.id.progress_sources);
+
         initSpinner();
 
         initAdapter();
@@ -41,7 +45,18 @@ public class SourcesActivity extends BaseActivity {
         initRecyclerView();
 
         viewModel = ViewModelProviders.of(this).get(SourcesViewModel.class);
-        viewModel.getSourcesFromApi().observe(this, this::updateAdapter);
+
+        viewModel.getSourcesFromApi().observe(this, sources -> {
+            updateAdapter(sources);
+            hideProgressBar();
+        });
+
+        viewModel.getErrorCode().observe(this, errorCode -> {
+            if (errorCode != null && errorCode == ErrorCodes.NETWORK_ERROR) {
+                showNetworkError();
+                hideProgressBar();
+            }
+        });
     }
 
     private void initSpinner() {
@@ -55,7 +70,7 @@ public class SourcesActivity extends BaseActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                String category = adapter.getItem(i).toLowerCase();
+                String category = adapter.getItem(i);
                 viewModel.getSourcesByCategory(category)
                         .observe(SourcesActivity.this, SourcesActivity.this::updateAdapter);
             }
@@ -73,11 +88,7 @@ public class SourcesActivity extends BaseActivity {
     }
 
     private void updateAdapter(List<Source> sources) {
-        ProgressBar progressBar = findViewById(R.id.progress_sources);
-        progressBar.setVisibility(View.GONE);
-
         adapter.submitList(sources);
-        adapter.notifyDataSetChanged();
     }
 
     private void initRecyclerView() {
@@ -96,5 +107,9 @@ public class SourcesActivity extends BaseActivity {
         intent.putExtra("source_id", source.getId());
         intent.putExtra("source_name", source.getName());
         startActivity(intent);
+    }
+
+    private void hideProgressBar() {
+        progressBar.setVisibility(View.GONE);
     }
 }

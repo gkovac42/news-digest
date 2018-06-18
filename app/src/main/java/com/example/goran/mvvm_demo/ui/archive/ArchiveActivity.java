@@ -1,4 +1,4 @@
-package com.example.goran.mvvm_demo.ui.articles;
+package com.example.goran.mvvm_demo.ui.archive;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -20,12 +20,13 @@ import com.example.goran.mvvm_demo.data.model.Article;
 import com.example.goran.mvvm_demo.ui.BaseActivity;
 import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter;
 import com.example.goran.mvvm_demo.ui.adapters.SimpleArticleAdapter;
+import com.example.goran.mvvm_demo.ui.articles.ReaderActivity;
 
 import java.util.List;
 
 public class ArchiveActivity extends BaseActivity {
 
-    private ArticlesViewModel viewModel;
+    private ArchiveViewModel viewModel;
     private ArticleAdapter adapter;
     private RecyclerView recyclerView;
 
@@ -45,7 +46,7 @@ public class ArchiveActivity extends BaseActivity {
 
         initRecyclerView();
 
-        viewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(ArchiveViewModel.class);
         viewModel.getArticlesFromDb().observe(this, articles -> {
             ProgressBar progressBar = findViewById(R.id.progress_list);
             progressBar.setVisibility(View.GONE);
@@ -125,7 +126,6 @@ public class ArchiveActivity extends BaseActivity {
 
     private void updateAdapter(List<Article> articles) {
         adapter.submitList(articles);
-        adapter.notifyDataSetChanged();
     }
 
     private void navigateToArticle(String articleUrl) {

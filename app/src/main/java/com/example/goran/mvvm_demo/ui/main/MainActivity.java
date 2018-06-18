@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.goran.mvvm_demo.R;
-import com.example.goran.mvvm_demo.ui.articles.ArchiveActivity;
-import com.example.goran.mvvm_demo.ui.articles.SearchActivity;
+import com.example.goran.mvvm_demo.ui.archive.ArchiveActivity;
+import com.example.goran.mvvm_demo.ui.search.SearchActivity;
 import com.example.goran.mvvm_demo.ui.sources.SourcesActivity;
 
 public class MainActivity extends AppCompatActivity {

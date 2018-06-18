@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".ui.articles.ArticlesActivity" />
         <activity
-            android:name=".ui.articles.ArchiveActivity"
+            android:name=".ui.archive.ArchiveActivity"
             android:label="@string/title_activity_archive" />
         <activity
             android:name=".ui.articles.ReaderActivity"
@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.articles.SearchActivity"
+            android:name=".ui.search.SearchActivity"
             android:label="@string/title_activity_search" />
 
 

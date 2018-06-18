@@ -1,8 +1,7 @@
-package com.example.goran.mvvm_demo.ui.articles;
+package com.example.goran.mvvm_demo.ui.search;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.database.sqlite.SQLiteConstraintException;
 import android.support.annotation.NonNull;
@@ -18,18 +17,22 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ArticlesViewModel extends AndroidViewModel {
+public class SearchViewModel extends AndroidViewModel {
 
     private DataRepository dataRepository;
     private MutableLiveData<List<Article>> articlesLiveData;
     private MutableLiveData<Integer> errorCodeLiveData;
 
-    public ArticlesViewModel(@NonNull Application application) {
+    public SearchViewModel(@NonNull Application application) {
         super(application);
 
         dataRepository = DataRepository.getInstance(application.getApplicationContext());
         articlesLiveData = new MutableLiveData<>();
         errorCodeLiveData = new MutableLiveData<>();
+    }
+
+    public MutableLiveData<List<Article>> getArticlesLiveData() {
+        return articlesLiveData;
     }
 
     public MutableLiveData<Integer> getErrorCodeLiveData() {
@@ -44,8 +47,8 @@ public class ArticlesViewModel extends AndroidViewModel {
         dataRepository.deleteFromDb(article);
     }
 
-    public LiveData<List<Article>> getArticlesFromApi(String source) {
-        dataRepository.getArticlesFromApi(source).enqueue(new Callback<ArticlesResponse>() {
+    public void searchApiForArticles(String query) {
+        dataRepository.searchApiForArticles(query).enqueue(new Callback<ArticlesResponse>() {
             @Override
             public void onResponse(@NonNull Call<ArticlesResponse> call,
                                    @NonNull Response<ArticlesResponse> response) {
@@ -59,7 +62,5 @@ public class ArticlesViewModel extends AndroidViewModel {
                 errorCodeLiveData.postValue(ErrorCodes.NETWORK_ERROR);
             }
         });
-
-        return articlesLiveData;
     }
 }

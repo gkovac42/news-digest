@@ -2,7 +2,6 @@ package com.example.goran.mvvm_demo.ui.articles;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.database.sqlite.SQLiteConstraintException;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DividerItemDecoration;
@@ -10,13 +9,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.example.goran.mvvm_demo.R;
 import com.example.goran.mvvm_demo.data.model.Article;
 import com.example.goran.mvvm_demo.ui.BaseActivity;
 import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter;
 import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter.AdapterListener;
+import com.example.goran.mvvm_demo.util.ErrorCodes;
 
 import java.util.List;
 
@@ -28,6 +27,7 @@ public class ArticlesActivity extends BaseActivity {
     private ArticlesViewModel viewModel;
     private ArticleAdapter adapter;
     private RecyclerView recyclerView;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +36,8 @@ public class ArticlesActivity extends BaseActivity {
 
         setStatusBarColor(R.color.colorRedDark);
         setActionBarColor(R.color.colorRed);
+
+        progressBar = findViewById(R.id.progress_list);
 
         String sourceName = getIntent().getStringExtra(EXTRA_SOURCE_NAME);
         getSupportActionBar().setTitle(sourceName);
@@ -47,7 +49,18 @@ public class ArticlesActivity extends BaseActivity {
         String sourceId = getIntent().getStringExtra(EXTRA_SOURCE_ID);
 
         viewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
-        viewModel.getArticlesFromApi(sourceId).observe(this, this::updateAdapter);
+
+        viewModel.getArticlesFromApi(sourceId).observe(this, articles -> {
+            updateAdapter(articles);
+            hideProgressBar();
+        });
+
+        viewModel.getErrorCodeLiveData().observe(this, errorCode -> {
+            if (errorCode != null && errorCode == ErrorCodes.NETWORK_ERROR) {
+                showNetworkError();
+                hideProgressBar();
+            }
+        });
     }
 
     private void initAdapter() {
@@ -60,13 +73,8 @@ public class ArticlesActivity extends BaseActivity {
 
             @Override
             public void onLongClick(Article article) {
-                try {
-                    viewModel.insertIntoDb(article);
-                    showInsertSnackbar(article);
-
-                } catch (SQLiteConstraintException e) {
-                    showErrorToast();
-                }
+                viewModel.insertIntoDb(article);
+                showInsertSnackbar(article);
             }
         });
     }
@@ -82,19 +90,8 @@ public class ArticlesActivity extends BaseActivity {
                 .show();
     }
 
-    private void showErrorToast() {
-        Toast.makeText(ArticlesActivity.this,
-                R.string.msg_already_archived,
-                Toast.LENGTH_SHORT)
-                .show();
-    }
-
     private void updateAdapter(List<Article> articles) {
-        ProgressBar progressBar = findViewById(R.id.progress_list);
-        progressBar.setVisibility(View.GONE);
-
         adapter.submitList(articles);
-        adapter.notifyDataSetChanged();
     }
 
     private void initRecyclerView() {
@@ -106,5 +103,9 @@ public class ArticlesActivity extends BaseActivity {
         recyclerView.addItemDecoration(divider);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
+    }
+
+    private void hideProgressBar() {
+        progressBar.setVisibility(View.GONE);
     }
 }
