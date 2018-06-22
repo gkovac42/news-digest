@@ -1,8 +1,12 @@
 package com.example.goran.mvvm_demo.data.remote;
 
+import android.content.Context;
+
 import com.example.goran.mvvm_demo.data.model.ArticlesResponse;
 import com.example.goran.mvvm_demo.data.model.SourcesResponse;
 
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -20,9 +24,16 @@ public class ApiHelper {
 
     private NewsApiService apiService;
 
-    public ApiHelper() {
+    public ApiHelper(Context context) {
+        Cache cache = new Cache(context.getApplicationContext().getCacheDir(), 1024 * 10 * 10);
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .cache(cache)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 

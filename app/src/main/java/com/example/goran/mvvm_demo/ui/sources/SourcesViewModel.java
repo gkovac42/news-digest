@@ -11,7 +11,7 @@ import com.example.goran.mvvm_demo.data.DataRepository;
 import com.example.goran.mvvm_demo.data.model.Source;
 import com.example.goran.mvvm_demo.data.model.SourcesResponse;
 import com.example.goran.mvvm_demo.util.Category;
-import com.example.goran.mvvm_demo.util.ErrorCodes;
+import com.example.goran.mvvm_demo.util.Code;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class SourcesViewModel extends AndroidViewModel {
 
             @Override
             public void onFailure(@NonNull Call<SourcesResponse> call, @NonNull Throwable t) {
-                errorCodeLiveData.postValue(ErrorCodes.NETWORK_ERROR);
+                errorCodeLiveData.postValue(Code.NETWORK_ERROR);
             }
         });
 

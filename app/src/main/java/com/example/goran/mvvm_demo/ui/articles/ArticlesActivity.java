@@ -14,10 +14,7 @@ import com.example.goran.mvvm_demo.R;
 import com.example.goran.mvvm_demo.data.model.Article;
 import com.example.goran.mvvm_demo.ui.BaseActivity;
 import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter;
-import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter.AdapterListener;
-import com.example.goran.mvvm_demo.util.ErrorCodes;
-
-import java.util.List;
+import com.example.goran.mvvm_demo.util.Code;
 
 public class ArticlesActivity extends BaseActivity {
 
@@ -32,15 +29,11 @@ public class ArticlesActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list);
-
-        setStatusBarColor(R.color.colorRedDark);
-        setActionBarColor(R.color.colorRed);
+        setContentView(R.layout.activity_articles);
 
         progressBar = findViewById(R.id.progress_list);
 
-        String sourceName = getIntent().getStringExtra(EXTRA_SOURCE_NAME);
-        getSupportActionBar().setTitle(sourceName);
+        setActionBarTitle();
 
         initAdapter();
 
@@ -51,31 +44,31 @@ public class ArticlesActivity extends BaseActivity {
         viewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
 
         viewModel.getArticlesFromApi(sourceId).observe(this, articles -> {
-            updateAdapter(articles);
+            adapter.submitList(articles);
             hideProgressBar();
         });
 
         viewModel.getErrorCodeLiveData().observe(this, errorCode -> {
-            if (errorCode != null && errorCode == ErrorCodes.NETWORK_ERROR) {
+            if (errorCode != null && errorCode == Code.NETWORK_ERROR) {
                 showNetworkError();
                 hideProgressBar();
             }
         });
     }
 
+    private void setActionBarTitle() {
+        String sourceName = getIntent().getStringExtra(EXTRA_SOURCE_NAME);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(sourceName);
+        }
+    }
+
     private void initAdapter() {
         adapter = new ArticleAdapter();
-        adapter.setListener(new AdapterListener() {
-            @Override
-            public void onClick(Article article) {
-                readArticle(article);
-            }
-
-            @Override
-            public void onLongClick(Article article) {
-                viewModel.insertIntoDb(article);
-                showInsertSnackbar(article);
-            }
+        adapter.setOnItemClickListener(this::readArticle);
+        adapter.setOnItemInsertListener(article -> {
+            viewModel.insertIntoDb(article);
+            showInsertSnackbar(article);
         });
     }
 
@@ -88,10 +81,6 @@ public class ArticlesActivity extends BaseActivity {
         Snackbar.make(recyclerView, R.string.msg_archived, Snackbar.LENGTH_LONG)
                 .setAction(R.string.action_undo, view -> viewModel.deleteFromDb(article))
                 .show();
-    }
-
-    private void updateAdapter(List<Article> articles) {
-        adapter.submitList(articles);
     }
 
     private void initRecyclerView() {

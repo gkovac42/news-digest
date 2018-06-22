@@ -1,11 +1,14 @@
 package com.example.goran.mvvm_demo.ui.adapters;
 
+import android.support.annotation.AnimRes;
 import android.support.annotation.NonNull;
 import android.support.v7.recyclerview.extensions.ListAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,22 +18,30 @@ import com.example.goran.mvvm_demo.data.model.Article;
 
 public class ArticleAdapter extends ListAdapter<Article, ArticleAdapter.ViewHolder> {
 
-    private AdapterListener listener;
+    private OnItemClickListener onItemClickListener;
+    private OnItemDeleteListener onItemDeleteListener;
+    private OnItemInsertListener onItemInsertListener;
 
     public ArticleAdapter() {
         super(Article.DIFF_CALLBACK);
     }
 
-    public void setListener(AdapterListener listener) {
-        this.listener = listener;
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    public void setOnItemDeleteListener(OnItemDeleteListener onItemDeleteListener) {
+        this.onItemDeleteListener = onItemDeleteListener;
+    }
+
+    public void setOnItemInsertListener(OnItemInsertListener onItemInsertListener) {
+        this.onItemInsertListener = onItemInsertListener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_article, parent, false);
-
         return new ViewHolder(itemView);
     }
 
@@ -47,8 +58,7 @@ public class ArticleAdapter extends ListAdapter<Article, ArticleAdapter.ViewHold
 
         ImageView imgThumb = itemView.findViewById(R.id.img_item_thumbnail);
 
-        Glide.with(holder.itemView.getContext())
-                .load(article.getUrlToImage())
+        Glide.with(itemView.getContext()).load(article.getUrlToImage())
                 .error(R.drawable.ic_info_outline_black_24dp)
                 .override(360, 180)
                 .into(imgThumb);
@@ -62,24 +72,47 @@ public class ArticleAdapter extends ListAdapter<Article, ArticleAdapter.ViewHold
             super(itemView);
 
             this.itemView = itemView;
-            this.itemView.setOnClickListener(view -> {
-                if (listener != null) {
-                    listener.onClick(getItem(getAdapterPosition()));
+
+            setListeners(itemView);
+        }
+
+        private void setListeners(View itemView) {
+            itemView.setOnClickListener(view -> {
+                if (onItemClickListener != null) {
+                    onItemClickListener.onClick(getItem(getAdapterPosition()));
                 }
             });
 
-            this.itemView.setOnLongClickListener(view -> {
-                if (listener != null) {
-                    listener.onLongClick(getItem(getAdapterPosition()));
+            itemView.setOnLongClickListener(view -> {
+                if (onItemDeleteListener != null) {
+                    animateView(itemView, android.R.anim.slide_out_right);
+                    onItemDeleteListener.onLongClick(getItem(getAdapterPosition()));
+
+                } else if (onItemInsertListener != null) {
+                    onItemInsertListener.onLongClick(getItem(getAdapterPosition()));
                 }
+
                 return true;
             });
         }
+
+        private void animateView(View view, @AnimRes int resId) {
+            Animation animation = AnimationUtils.loadAnimation(view.getContext(), resId);
+            view.startAnimation(animation);
+        }
     }
 
-    public interface AdapterListener {
+    public interface OnItemClickListener {
 
         void onClick(Article article);
+    }
+
+    public interface OnItemDeleteListener {
+
+        void onLongClick(Article article);
+    }
+
+    public interface OnItemInsertListener {
 
         void onLongClick(Article article);
     }

@@ -1,30 +1,28 @@
 package com.example.goran.mvvm_demo.ui;
 
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
+import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.example.goran.mvvm_demo.R;
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 
-    public void setActionBarColor(int colorRes) {
-
-        ColorDrawable cd = new ColorDrawable(getResources().getColor(colorRes));
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onCreate(savedInstanceState, persistentState);
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setBackgroundDrawable(cd);
-        }
-    }
-
-    public void setStatusBarColor(int colorRes) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(getResources().getColor(colorRes));
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
     }
 
     public void showNetworkError() {
-        Toast.makeText(this, R.string.error_network, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,
+                R.string.error_network,
+                Toast.LENGTH_SHORT)
+                .show();
     }
 }

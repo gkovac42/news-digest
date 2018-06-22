@@ -18,9 +18,7 @@ import com.example.goran.mvvm_demo.ui.BaseActivity;
 import com.example.goran.mvvm_demo.ui.adapters.SourceAdapter;
 import com.example.goran.mvvm_demo.ui.articles.ArticlesActivity;
 import com.example.goran.mvvm_demo.util.Category;
-import com.example.goran.mvvm_demo.util.ErrorCodes;
-
-import java.util.List;
+import com.example.goran.mvvm_demo.util.Code;
 
 public class SourcesActivity extends BaseActivity {
 
@@ -33,9 +31,6 @@ public class SourcesActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sources);
 
-        setActionBarColor(R.color.colorRed);
-        setStatusBarColor(R.color.colorRedDark);
-
         progressBar = findViewById(R.id.progress_sources);
 
         initSpinner();
@@ -47,12 +42,12 @@ public class SourcesActivity extends BaseActivity {
         viewModel = ViewModelProviders.of(this).get(SourcesViewModel.class);
 
         viewModel.getSourcesFromApi().observe(this, sources -> {
-            updateAdapter(sources);
             hideProgressBar();
+            adapter.submitList(sources);
         });
 
         viewModel.getErrorCode().observe(this, errorCode -> {
-            if (errorCode != null && errorCode == ErrorCodes.NETWORK_ERROR) {
+            if (errorCode != null && errorCode == Code.NETWORK_ERROR) {
                 showNetworkError();
                 hideProgressBar();
             }
@@ -60,19 +55,19 @@ public class SourcesActivity extends BaseActivity {
     }
 
     private void initSpinner() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
                 Category.getCategories());
 
         Spinner spinner = findViewById(R.id.spinner_sources);
-        spinner.setAdapter(adapter);
+        spinner.setAdapter(spinnerAdapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                String category = adapter.getItem(i);
-                viewModel.getSourcesByCategory(category)
-                        .observe(SourcesActivity.this, SourcesActivity.this::updateAdapter);
+                String category = spinnerAdapter.getItem(i);
+                viewModel.getSourcesByCategory(category).observe(SourcesActivity.this,
+                        sources -> adapter.submitList(sources));
             }
 
             @Override
@@ -85,10 +80,6 @@ public class SourcesActivity extends BaseActivity {
     private void initAdapter() {
         adapter = new SourceAdapter();
         adapter.setListener(this::navigateToMainActivity);
-    }
-
-    private void updateAdapter(List<Source> sources) {
-        adapter.submitList(sources);
     }
 
     private void initRecyclerView() {

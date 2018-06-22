@@ -1,7 +1,6 @@
 package com.example.goran.mvvm_demo.ui.archive;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -22,25 +21,18 @@ import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter;
 import com.example.goran.mvvm_demo.ui.adapters.SimpleArticleAdapter;
 import com.example.goran.mvvm_demo.ui.articles.ReaderActivity;
 
-import java.util.List;
-
 public class ArchiveActivity extends BaseActivity {
+
+    public static final int MIN_QUERY_LENGTH = 3;
 
     private ArchiveViewModel viewModel;
     private ArticleAdapter adapter;
     private RecyclerView recyclerView;
 
-    public static Intent newIntent(Context context) {
-        return new Intent(context, ArchiveActivity.class);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list);
-
-        setActionBarColor(R.color.colorBlue);
-        setStatusBarColor(R.color.colorBlueDark);
+        setContentView(R.layout.activity_articles);
 
         initAdapter();
 
@@ -50,7 +42,7 @@ public class ArchiveActivity extends BaseActivity {
         viewModel.getArticlesFromDb().observe(this, articles -> {
             ProgressBar progressBar = findViewById(R.id.progress_list);
             progressBar.setVisibility(View.GONE);
-            updateAdapter(articles);
+            adapter.submitList(articles);
         });
     }
 
@@ -64,53 +56,64 @@ public class ArchiveActivity extends BaseActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                performSearch(query);
+                processQuery(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 String query = searchView.getQuery().toString();
-
-                if (query.length() > 2) {
-                    performSearch(query);
-
-                } else if (query.isEmpty()) {
-                    viewModel.getArticlesFromDb()
-                            .observe(ArchiveActivity.this, ArchiveActivity.this::updateAdapter);
-                }
+                processQuery(query);
                 return false;
             }
         });
         return true;
     }
 
-    private void performSearch(String query) {
-        viewModel.searchDbByTitle(query).observe(this, this::updateAdapter);
+    private void processQuery(String query) {
+        if (query.length() >= MIN_QUERY_LENGTH) {
+            viewModel.searchDbByTitle(query).observe(this,
+                    articles -> adapter.submitList(articles));
+
+        } else if (query.isEmpty()) {
+            viewModel.getArticlesFromDb()
+                    .observe(ArchiveActivity.this,
+                            articles -> adapter.submitList(articles));
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_clear) {
-            showClearDialog();
+        switch (item.getItemId()) {
+            case R.id.menu_clear:
+                showClearDialog();
+                break;
+            case android.R.id.home:
+                onBackPressed();
+                break;
         }
         return true;
     }
 
     private void initAdapter() {
         adapter = new SimpleArticleAdapter();
-        adapter.setListener(new ArticleAdapter.AdapterListener() {
-            @Override
-            public void onClick(Article article) {
-                navigateToArticle(article.getUrl());
-            }
-
-            @Override
-            public void onLongClick(Article article) {
-                viewModel.deleteFromDb(article);
-                showDeleteSnackbar(article);
-            }
+        adapter.setOnItemClickListener(this::readArticle);
+        adapter.setOnItemDeleteListener(article -> {
+            viewModel.deleteFromDb(article);
+            showDeleteSnackbar(article);
         });
+    }
+
+    private void readArticle(Article article) {
+        String url = article.getUrl();
+        Intent intent = ReaderActivity.newIntent(this, url);
+        startActivity(intent);
+    }
+
+    private void showDeleteSnackbar(final Article article) {
+        Snackbar.make(recyclerView, R.string.msg_removed, Snackbar.LENGTH_LONG)
+                .setAction(R.string.action_undo, view -> viewModel.insertIntoDb(article))
+                .show();
     }
 
     private void initRecyclerView() {
@@ -124,24 +127,9 @@ public class ArchiveActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    private void updateAdapter(List<Article> articles) {
-        adapter.submitList(articles);
-    }
-
-    private void navigateToArticle(String articleUrl) {
-        Intent intent = ReaderActivity.newIntent(ArchiveActivity.this, articleUrl);
-        startActivity(intent);
-    }
-
-    private void showDeleteSnackbar(final Article article) {
-        Snackbar.make(recyclerView, R.string.msg_removed, Snackbar.LENGTH_LONG)
-                .setAction(R.string.action_undo, view -> viewModel.insertIntoDb(article))
-                .show();
-    }
-
     private void showClearDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("Caution!")
+                .setTitle(R.string.title_dialog)
                 .setMessage(R.string.msg_clear)
                 .setPositiveButton(R.string.action_yes, (dialogInterface, i) -> viewModel.clearDb())
                 .setNegativeButton(R.string.action_no, null)

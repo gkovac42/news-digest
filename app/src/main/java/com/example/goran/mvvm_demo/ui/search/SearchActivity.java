@@ -20,7 +20,7 @@ import com.example.goran.mvvm_demo.data.model.Article;
 import com.example.goran.mvvm_demo.ui.BaseActivity;
 import com.example.goran.mvvm_demo.ui.adapters.ArticleAdapter;
 import com.example.goran.mvvm_demo.ui.articles.ReaderActivity;
-import com.example.goran.mvvm_demo.util.ErrorCodes;
+import com.example.goran.mvvm_demo.util.Code;
 
 import java.util.List;
 
@@ -36,9 +36,6 @@ public class SearchActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-
-        setActionBarColor(R.color.colorGreen);
-        setStatusBarColor(R.color.colorGreenDark);
 
         progressBar = findViewById(R.id.progress_search);
 
@@ -56,7 +53,7 @@ public class SearchActivity extends BaseActivity {
         });
 
         viewModel.getErrorCodeLiveData().observe(this, errorCode -> {
-            if (errorCode != null && errorCode == ErrorCodes.NETWORK_ERROR) {
+            if (errorCode != null && errorCode == Code.NETWORK_ERROR) {
                 showNetworkError();
                 hideProgressBar();
             }
@@ -88,29 +85,24 @@ public class SearchActivity extends BaseActivity {
     private void hideSoftKeyboard() {
         InputMethodManager inputMethodManager =
                 (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        if (inputMethodManager != null) {
-            inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+
+        if (inputMethodManager != null && getCurrentFocus() != null) {
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
     }
 
     private void initAdapter() {
         adapter = new ArticleAdapter();
-        adapter.setListener(new ArticleAdapter.AdapterListener() {
-            @Override
-            public void onClick(Article article) {
-                navigateToArticle(article.getUrl());
-            }
-
-            @Override
-            public void onLongClick(Article article) {
-                viewModel.insertIntoDb(article);
-                showInsertSnackbar(article);
-            }
+        adapter.setOnItemClickListener(this::readArticle);
+        adapter.setOnItemInsertListener(article -> {
+            viewModel.insertIntoDb(article);
+            showInsertSnackbar(article);
         });
     }
 
-    private void navigateToArticle(String articleUrl) {
-        Intent intent = ReaderActivity.newIntent(SearchActivity.this, articleUrl);
+    private void readArticle(Article article) {
+        String url = article.getUrl();
+        Intent intent = ReaderActivity.newIntent(this, url);
         startActivity(intent);
     }
 

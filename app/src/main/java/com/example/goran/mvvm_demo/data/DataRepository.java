@@ -27,7 +27,7 @@ public class DataRepository {
 
     public static DataRepository getInstance(Context context) {
         if (instance == null) {
-            instance = new DataRepository(new ApiHelper(),
+            instance = new DataRepository(new ApiHelper(context),
                     ArticleRoomDatabase.getDatabase(context));
         }
         return instance;

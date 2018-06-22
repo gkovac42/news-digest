@@ -11,10 +11,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.articles.ArticlesActivity" />
+        <activity
+            android:name=".ui.articles.ArticlesActivity"
+            android:theme="@style/RedTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.goran.mvvm_demo.ui.sources.SourcesActivity" />
+        </activity>
         <activity
             android:name=".ui.archive.ArchiveActivity"
-            android:label="@string/title_activity_archive" />
+            android:label="@string/title_activity_archive"
+            android:theme="@style/BlueTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.goran.mvvm_demo.ui.main.MainActivity" />
+        </activity>
         <activity
             android:name=".ui.articles.ReaderActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -22,17 +33,26 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".ui.sources.SourcesActivity"
-            android:label="@string/title_activity_sources" />
+            android:label="@string/title_activity_sources"
+            android:theme="@style/RedTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.goran.mvvm_demo.ui.main.MainActivity" />
+        </activity>
         <activity android:name=".ui.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.search.SearchActivity"
-            android:label="@string/title_activity_search" />
+            android:label="@string/title_activity_search"
+            android:theme="@style/GreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.goran.mvvm_demo.ui.main.MainActivity" />
+        </activity>
 
 
     </application>

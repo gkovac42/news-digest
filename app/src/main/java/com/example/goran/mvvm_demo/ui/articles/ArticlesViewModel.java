@@ -10,7 +10,7 @@ import android.support.annotation.NonNull;
 import com.example.goran.mvvm_demo.data.DataRepository;
 import com.example.goran.mvvm_demo.data.model.Article;
 import com.example.goran.mvvm_demo.data.model.ArticlesResponse;
-import com.example.goran.mvvm_demo.util.ErrorCodes;
+import com.example.goran.mvvm_demo.util.Code;
 
 import java.util.List;
 
@@ -56,7 +56,7 @@ public class ArticlesViewModel extends AndroidViewModel {
             @Override
             public void onFailure(@NonNull Call<ArticlesResponse> call,
                                   @NonNull Throwable t) {
-                errorCodeLiveData.postValue(ErrorCodes.NETWORK_ERROR);
+                errorCodeLiveData.postValue(Code.NETWORK_ERROR);
             }
         });
 
